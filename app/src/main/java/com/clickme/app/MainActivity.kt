@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             supportFragmentManager.beginTransaction()
                 .replace(R.id.content_frame, NotificationsFragment())
                 .commit()
-            binding.drawer.setCheckedItem(R.id.nav_notifications)
+            binding.navView.setCheckedItem(R.id.nav_notifications)
         }
 
         // Arahkan user ke pengaturan izin notifikasi kalau belum aktif
