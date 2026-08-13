@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Clickme</string>
+    <string name="service_name">Clickme Notification Listener</string>
+    <string name="drawer_open">Open navigation</string>
+    <string name="drawer_close">Close navigation</string>
+    <string name="nav_notifications">Notifications</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_search">Search / Filter</string>
+    <string name="nav_export">Export</string>
+    <string name="nav_about">About</string>
+    <string name="soon_search">Search / Filter coming soon</string>
+    <string name="soon_export">Export coming soon</string>
+    <string name="about_text">Clickme reads your device notifications locally. No data leaves your phone.</string>
+    <string name="grant_permission_hint">Enable Clickme in Notification access to start capturing</string>
+    <string name="empty_state">No notifications yet. Grant access and wait for new notifications.</string>
+    <string name="settings_grant">Grant notification access</string>
+</resources>

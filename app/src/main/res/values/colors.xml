@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Palette sengaja: charcoal + warm coral accent (bukan ungu/violet default) -->
+    <color name="primary">#1B1B1F</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#2A2A30</color>
+    <color name="accent">#FF8A65</color>
+    <color name="surface">#FAF9FD</color>
+    <color name="surface_dark">#121214</color>
+    <color name="on_surface">#1B1B1F</color>
+    <color name="on_surface_dark">#E6E1E5</color>
+    <color name="surface_variant">#ECECF1</color>
+    <color name="on_surface_variant">#49454F</color>
+    <color name="outline">#79747E</color>
+    <color name="error">#B3261E</color>
+</resources>
