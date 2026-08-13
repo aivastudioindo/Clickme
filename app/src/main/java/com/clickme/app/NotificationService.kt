@@ -32,17 +32,19 @@ class NotificationService : NotificationListenerService() {
     private val executor = Executors.newSingleThreadExecutor()
     private val recentNotificationsCache = LruCache<String, LastNotiData>(30)
 
+    // Daftar paket/sistem yang boleh diabaikan (mirip repo Alfio010).
+    private val SYSTEM_BLACKLIST = setOf(
+        "android",
+        "com.android.systemui",
+        "com.android.providers.downloads",
+        "com.android.providers.media",
+        "com.android.packageinstaller"
+    )
+
     private data class LastNotiData(val title: String, val text: String, val date: Long)
 
     companion object {
         private const val DUPLICATE_WINDOW_MS = 30_000L
-        private val SYSTEM_BLACKLIST = setOf(
-            "android",
-            "com.android.systemui",
-            "com.android.providers.downloads",
-            "com.android.providers.media",
-            "com.android.packageinstaller"
-        )
 
         /**
          * Catch-up: ambil notifikasi yang sedang aktif di sistem dan masukkan ke repository.
@@ -143,9 +145,10 @@ class NotificationService : NotificationListenerService() {
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
         val safe = sbn ?: return
-        // Abaikan notifikasi summary grup (hanya berisi "N pesan baru", bukan isi).
-        // Isi sebenarnya ada di notifikasi anak yang memakai groupKey yang sama.
-        if (isGroupSummary(safe)) return
+        // Ikuti pendekatan repo Alfio010: terima semua notifikasi (termasuk summary
+        // grup), lalu dedupe + blacklist spesifik. Tidak membuang notif agar tidak
+        // ada pesan yang terlewat.
+        if (shouldIgnore(safe)) return
         executor.execute {
             try {
                 capture(safe)
@@ -155,8 +158,17 @@ class NotificationService : NotificationListenerService() {
         }
     }
 
-    private fun isGroupSummary(sbn: StatusBarNotification): Boolean {
-        return (sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0
+    private fun shouldIgnore(sbn: StatusBarNotification): Boolean {
+        val pkg = sbn.packageName ?: return true
+        if (pkg in SYSTEM_BLACKLIST) return true
+        // Blacklist spesifik dari repo Alfio010 (notif sistem/sampah).
+        if (pkg.startsWith("com.whatsapp") && sbn.key?.contains("null") == true) return true
+        if (pkg == "com.sec.android.app.clock.package") return true
+        if (pkg == BuildConfig.APPLICATION_ID) return true
+        if (sbn.key == "-1|android|27|null|1000") return true
+        if (sbn.key == "charging_state") return true
+        if (sbn.key == "com.sec.android.app.samsungapps|121314|null|10091") return true
+        return false
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
@@ -195,7 +207,8 @@ class NotificationService : NotificationListenerService() {
         val extras: Bundle = sbn.notification?.extras ?: return
         val data = extract(extras)
 
-        if (data.title.isEmpty() && data.text.isEmpty()) return
+        // Sama seperti repo Alfio010: dedupe per package + window 30 detik.
+        if (data.title.isEmpty() && data.text.isEmpty() && data.lines.isEmpty()) return
 
         val current = LastNotiData(data.title, data.text, sbn.notification.`when`)
         val last = recentNotificationsCache[pkg]
