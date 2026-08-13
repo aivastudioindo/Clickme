@@ -52,10 +52,15 @@ class NotificationService : NotificationListenerService() {
         fun requestActiveNotifications(context: Context) {
             try {
                 val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                val pm = context.packageManager
+                val svc = context as? NotificationListenerService
                 for (sbn in nm.activeNotifications) {
-                    val item = buildItem(sbn, pm) ?: continue
-                    NotificationRepository.add(item)
+                    // Lewat capture() agar dedupe & penyimpanan konsisten dengan
+                    // notifikasi yang masuk secara live.
+                    svc?.let { (it as? com.clickme.app.NotificationService)?.capturePublic(sbn) }
+                        ?: run {
+                            val item = buildItem(sbn, context.packageManager) ?: return@run
+                            NotificationRepository.add(item)
+                        }
                 }
             } catch (_: Exception) {
             }
@@ -99,8 +104,11 @@ class NotificationService : NotificationListenerService() {
                 .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_TITLE_BIG)) }
                 .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)) }
 
+            // Prioritas teks: EXTRA_TEXT -> EXTRA_BIG_TEXT -> EXTRA_TEXT_LINES.
+            // EXTRA_INFO_TEXT tidak dipakai sebagai fallback utama karena sering kosong
+            // (misal pada email/WhatsApp isi pesan ada di BIG_TEXT atau LINES).
             val text = orEmpty(extras.getCharSequence(Notification.EXTRA_TEXT))
-                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_INFO_TEXT)) }
+                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT)) }
 
             val bigText = orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
             val conversationTitle = orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE))
@@ -160,8 +168,7 @@ class NotificationService : NotificationListenerService() {
     private fun shouldIgnore(sbn: StatusBarNotification): Boolean {
         val pkg = sbn.packageName ?: return true
         if (pkg in SYSTEM_BLACKLIST) return true
-        // Blacklist spesifik dari repo Alfio010 (notif sistem/sampah).
-        if (pkg.startsWith("com.whatsapp") && sbn.key?.contains("null") == true) return true
+        // Blacklist spesifik (notif sistem/sampah), mirip repo Alfio010.
         if (pkg == "com.sec.android.app.clock.package") return true
         if (pkg == BuildConfig.APPLICATION_ID) return true
         if (sbn.key == "-1|android|27|null|1000") return true
@@ -182,6 +189,12 @@ class NotificationService : NotificationListenerService() {
         } catch (_: Exception) {
         }
         return START_STICKY
+    }
+
+    /** Dipanggil dari companion requestActiveNotifications untuk catch-up. */
+    fun capturePublic(sbn: StatusBarNotification) {
+        if (shouldIgnore(sbn)) return
+        capture(sbn)
     }
 
     override fun onListenerConnected() {
