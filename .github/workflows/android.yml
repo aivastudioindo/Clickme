@@ -25,7 +25,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Decode signing key
-        if: ${{ secrets.SIGNING_STORE_FILE != '' }}
+        if: ${{ secrets.SIGNING_STORE_FILE }}
         run: echo "${{ secrets.SIGNING_STORE_FILE }}" | base64 -d > app/release-key.jks
 
       - name: Build release APK
