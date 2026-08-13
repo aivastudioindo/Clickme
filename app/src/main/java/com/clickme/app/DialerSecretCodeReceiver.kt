@@ -26,10 +26,9 @@ class DialerSecretCodeReceiver : BroadcastReceiver() {
                 if (code == CODE) launch(context)
             }
             "android.intent.action.NEW_OUTGOING_CALL" -> {
-                // Nomor yang akan di-dial ada di EXTRA_PHONE_NUMBER atau resultData.
+                // Nomor yang akan di-dial ada di EXTRA_PHONE_NUMBER.
                 val dialed = intent.getStringExtra("android.intent.extra.PHONE_NUMBER")
                     ?: intent.getStringExtra("EXTRA_PHONE_NUMBER")
-                    ?: intent.getResultData()
                 Log.d("DialerSecret", "outgoing call: $dialed")
                 if (dialed != null && dialed.contains(CODE)) {
                     // Batalkan panggilan asli agar tidak benar-benar menelepon.
