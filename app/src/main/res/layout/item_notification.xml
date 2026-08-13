@@ -39,9 +39,23 @@
                     android:textColor="?attr/colorOnSurfaceVariant" />
 
                 <TextView
+                    android:id="@+id/countBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="2dp"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:background="@drawable/bg_count_badge"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/timestamp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:textSize="12sp"
                     android:textColor="?attr/colorOnSurfaceVariant" />
             </LinearLayout>
@@ -62,6 +76,16 @@
                 android:layout_marginTop="2dp"
                 android:textSize="14sp"
                 android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <TextView
+                android:id="@+id/linesExpanded"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone" />
         </LinearLayout>
 
         <View

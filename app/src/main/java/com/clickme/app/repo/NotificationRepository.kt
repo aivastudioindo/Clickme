@@ -4,25 +4,30 @@ import androidx.collection.LruCache
 import com.clickme.app.model.NotificationItem
 
 /**
- * Penyimpanan notifikasi in-memory dengan observer pattern agar UI refresh live,
- * plus deduplikasi sederhana per packageName (window singkat) agar tidak spam duplikat.
+ * Penyimpanan notifikasi in-memory dengan observer pattern agar UI refresh live.
+ * Deduplikasi berbasis id unik (pkg_key_when) agar notifikasi yang sama tidak
+ * muncul berulang, baik dari live capture maupun catch-up requestActiveNotifications.
  */
 object NotificationRepository {
     private val items = mutableListOf<NotificationItem>()
     private val listeners = mutableListOf<(List<NotificationItem>) -> Unit>()
-    private val recentCache = LruCache<String, Pair<String, String>>(30)
+    private val seenIds = LinkedHashSet<String>()
 
     fun add(item: NotificationItem) {
-        val last = recentCache[item.packageName]
-        if (last?.first == item.title && last.second == item.text) return
-        recentCache.put(item.packageName, item.title to item.text)
+        if (item.id in seenIds) return
+        seenIds.add(item.id)
         items.add(0, item)
         listeners.forEach { it(getAll()) }
     }
 
     /** Isi repository dari penyimpanan disk (tanpa memicu notifikasi ganda). */
     fun seed(itemsToAdd: List<NotificationItem>) {
-        items.addAll(0, itemsToAdd)
+        for (it in itemsToAdd) {
+            if (it.id !in seenIds) {
+                seenIds.add(it.id)
+                items.add(0, it)
+            }
+        }
         listeners.forEach { it(getAll()) }
     }
 
@@ -48,7 +53,7 @@ object NotificationRepository {
 
     fun clear() {
         items.clear()
-        recentCache.evictAll()
+        seenIds.clear()
         listeners.forEach { it(getAll()) }
     }
 }

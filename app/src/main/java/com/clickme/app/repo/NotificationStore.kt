@@ -28,6 +28,9 @@ object NotificationStore {
                 o.put("conversationTitle", it.conversationTitle)
                 o.put("groupKey", it.groupKey ?: "")
                 o.put("timestamp", it.timestamp)
+                val linesArr = org.json.JSONArray()
+                it.lines.forEach { line -> linesArr.put(line) }
+                o.put("lines", linesArr)
                 arr.put(o)
             }
             context.applicationContext.openFileOutput(FILE_NAME, Context.MODE_PRIVATE).use {
@@ -58,7 +61,17 @@ object NotificationStore {
                         bigText = o.optString("bigText"),
                         conversationTitle = o.optString("conversationTitle"),
                         groupKey = o.optString("groupKey").ifEmpty { null },
-                        timestamp = o.optLong("timestamp")
+                        timestamp = o.optLong("timestamp"),
+                        lines = run {
+                            val arr = o.optJSONArray("lines")
+                            val list = mutableListOf<String>()
+                            if (arr != null) {
+                                for (j in 0 until arr.length()) {
+                                    list.add(arr.optString(j))
+                                }
+                            }
+                            list
+                        }
                     )
                 )
             }

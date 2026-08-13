@@ -15,5 +15,9 @@ data class NotificationItem(
     val conversationTitle: String,
     val groupKey: String?,
     val timestamp: Long,
+    val lines: List<String> = emptyList(),
     var isNew: Boolean = true
-)
+) {
+    /** True bila notifikasi ini adalah bagian dari grup (punya groupKey). */
+    val isGroup: Boolean get() = !groupKey.isNullOrEmpty()
+}

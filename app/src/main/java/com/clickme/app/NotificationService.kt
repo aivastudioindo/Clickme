@@ -65,23 +65,31 @@ class NotificationService : NotificationListenerService() {
             if (pkg in SYSTEM_BLACKLIST) return null
             val extras: Bundle = sbn.notification?.extras ?: return null
             val data = extract(extras)
-            if (data.title.isEmpty() && data.text.isEmpty()) return null
+            if (data.title.isEmpty() && data.text.isEmpty() && data.lines.isEmpty()) return null
             val appName = try {
                 val ai = pm.getApplicationInfo(pkg, 0)
                 pm.getApplicationLabel(ai).toString()
             } catch (_: Exception) {
                 pkg
             }
+            // Untuk notifikasi bertumpuk, tampilkan baris pertama sebagai ringkasan
+            // dan simpan semua baris ke `lines` agar bisa di-expand di UI.
+            val summaryText = if (data.lines.isNotEmpty()) {
+                data.lines.first()
+            } else {
+                data.text.ifEmpty { data.bigText }
+            }
             return NotificationItem(
                 id = "${pkg}_${sbn.key}_${sbn.notification.`when`}",
                 packageName = pkg,
                 appName = appName,
-                title = data.title,
-                text = data.text,
+                title = data.title.ifEmpty { data.conversationTitle },
+                text = summaryText,
                 bigText = data.bigText,
                 conversationTitle = data.conversationTitle,
                 groupKey = sbn.groupKey,
-                timestamp = sbn.notification.`when`.takeIf { it > 0 } ?: System.currentTimeMillis()
+                timestamp = sbn.notification.`when`.takeIf { it > 0 } ?: System.currentTimeMillis(),
+                lines = data.lines
             )
         }
 
@@ -91,18 +99,32 @@ class NotificationService : NotificationListenerService() {
                 .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)) }
 
             val text = orEmpty(extras.getCharSequence(Notification.EXTRA_TEXT))
-                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT)) }
-                .ifEmpty { fromLines(extras) }
                 .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_INFO_TEXT)) }
 
             val bigText = orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
             val conversationTitle = orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE))
-            return NotiData(title, text, bigText, conversationTitle)
+
+            // Notifikasi bertumpuk (misal WhatsApp grup) menyimpan tiap pesan di EXTRA_TEXT_LINES.
+            val lines = fromLines(extras)
+
+            return NotiData(title, text, bigText, conversationTitle, lines)
         }
 
-        private fun fromLines(extras: Bundle): String {
-            val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES) ?: return ""
-            return lines.filterNotNull().joinToString("\n") { it.toString() }.trim()
+        private fun fromLines(extras: Bundle): List<String> {
+            val raw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    extras.getCharSequenceArrayList(Notification.EXTRA_TEXT_LINES)
+                } catch (_: Exception) {
+                    extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
+                }
+            } else {
+                extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
+            }
+            return raw?.filterNotNull()
+                ?.map { it.toString().trim() }
+                ?.filter { it.isNotEmpty() }
+                ?: emptyList()
         }
 
         private fun orEmpty(cs: CharSequence?): String = cs?.toString()?.trim() ?: ""
@@ -111,13 +133,17 @@ class NotificationService : NotificationListenerService() {
             val title: String,
             val text: String,
             val bigText: String,
-            val conversationTitle: String
+            val conversationTitle: String,
+            val lines: List<String>
         )
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
         val safe = sbn ?: return
+        // Abaikan notifikasi summary grup (hanya berisi "N pesan baru", bukan isi).
+        // Isi sebenarnya ada di notifikasi anak yang memakai groupKey yang sama.
+        if (isGroupSummary(safe)) return
         executor.execute {
             try {
                 capture(safe)
@@ -125,6 +151,10 @@ class NotificationService : NotificationListenerService() {
                 // jangan biarkan crash mematikan service
             }
         }
+    }
+
+    private fun isGroupSummary(sbn: StatusBarNotification): Boolean {
+        return (sbn.notification.flags and Notification.FLAG_GROUP_SUMMARY) != 0
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
