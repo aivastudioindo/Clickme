@@ -17,9 +17,10 @@ class NotificationsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: NotificationAdapter
     private val observer: (List<com.clickme.app.model.NotificationItem>) -> Unit = { items ->
-        val b = _binding ?: return@observer
-        b.emptyState.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
-        adapter.submitList(items)
+        _binding?.let { b ->
+            b.emptyState.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+            adapter.submitList(items)
+        }
     }
 
     override fun onCreateView(

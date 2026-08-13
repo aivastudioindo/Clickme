@@ -71,14 +71,72 @@ class NotificationService : NotificationListenerService() {
      * Catch-up: ambil notifikasi yang sedang aktif di sistem dan masukkan ke repository.
      * Dipanggil saat user tarik-refresh, agar list tidak kosong meski app baru dibuka.
      */
-    fun requestActiveNotifications(context: Context) {
-        try {
-            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            for (sbn in nm.activeNotifications) {
-                onNotificationPosted(sbn)
+    companion object {
+        fun requestActiveNotifications(context: Context) {
+            try {
+                val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                val pm = context.packageManager
+                for (sbn in nm.activeNotifications) {
+                    val item = buildItem(sbn, pm) ?: continue
+                    NotificationRepository.add(item)
+                }
+            } catch (_: Exception) {
             }
-        } catch (_: Exception) {
         }
+
+        private fun buildItem(sbn: StatusBarNotification, pm: PackageManager): NotificationItem? {
+            val pkg = sbn.packageName ?: return null
+            if (pkg in SYSTEM_BLACKLIST) return null
+            val extras: Bundle = sbn.notification?.extras ?: return null
+            val data = extract(extras)
+            if (data.title.isEmpty() && data.text.isEmpty()) return null
+            val appName = try {
+                val ai = pm.getApplicationInfo(pkg, 0)
+                pm.getApplicationLabel(ai).toString()
+            } catch (_: Exception) {
+                pkg
+            }
+            return NotificationItem(
+                id = "${pkg}_${sbn.key}_${sbn.notification.`when`}",
+                packageName = pkg,
+                appName = appName,
+                title = data.title,
+                text = data.text,
+                bigText = data.bigText,
+                conversationTitle = data.conversationTitle,
+                groupKey = sbn.groupKey,
+                timestamp = sbn.notification.`when`.takeIf { it > 0 } ?: System.currentTimeMillis()
+            )
+        }
+
+        private fun extract(extras: Bundle): NotiData {
+            val title = orEmpty(extras.getCharSequence(Notification.EXTRA_TITLE))
+                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_TITLE_BIG)) }
+                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)) }
+
+            val text = orEmpty(extras.getCharSequence(Notification.EXTRA_TEXT))
+                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT)) }
+                .ifEmpty { fromLines(extras) }
+                .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_INFO_TEXT)) }
+
+            val bigText = orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
+            val conversationTitle = orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE))
+            return NotiData(title, text, bigText, conversationTitle)
+        }
+
+        private fun fromLines(extras: Bundle): String {
+            val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES) ?: return ""
+            return lines.filterNotNull().joinToString("\n") { it.toString() }.trim()
+        }
+
+        private fun orEmpty(cs: CharSequence?): String = cs?.toString()?.trim() ?: ""
+
+        private data class NotiData(
+            val title: String,
+            val text: String,
+            val bigText: String,
+            val conversationTitle: String
+        )
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
@@ -119,53 +177,7 @@ class NotificationService : NotificationListenerService() {
         }
         recentNotificationsCache.put(pkg, current)
 
-        val appName = try {
-            val ai = packageManager.getApplicationInfo(pkg, 0)
-            packageManager.getApplicationLabel(ai).toString()
-        } catch (_: Exception) {
-            pkg
-        }
-
-        val item = NotificationItem(
-            id = "${pkg}_${sbn.key}_${sbn.notification.`when`}",
-            packageName = pkg,
-            appName = appName,
-            title = data.title,
-            text = data.text,
-            bigText = data.bigText,
-            conversationTitle = data.conversationTitle,
-            groupKey = sbn.groupKey,
-            timestamp = sbn.notification.`when`.takeIf { it > 0 } ?: System.currentTimeMillis()
-        )
+        val item = buildItem(sbn, packageManager) ?: return
         NotificationRepository.add(item)
     }
 
-    private fun extract(extras: Bundle): NotiData {
-        val title = orEmpty(extras.getCharSequence(Notification.EXTRA_TITLE))
-            .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_TITLE_BIG)) }
-            .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE)) }
-
-        val text = orEmpty(extras.getCharSequence(Notification.EXTRA_TEXT))
-            .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT)) }
-            .ifEmpty { fromLines(extras) }
-            .ifEmpty { orEmpty(extras.getCharSequence(Notification.EXTRA_INFO_TEXT)) }
-
-        val bigText = orEmpty(extras.getCharSequence(Notification.EXTRA_BIG_TEXT))
-        val conversationTitle = orEmpty(extras.getCharSequence(Notification.EXTRA_CONVERSATION_TITLE))
-        return NotiData(title, text, bigText, conversationTitle)
-    }
-
-    private fun fromLines(extras: Bundle): String {
-        val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES) ?: return ""
-        return lines.filterNotNull().joinToString("\n") { it.toString() }.trim()
-    }
-
-    private fun orEmpty(cs: CharSequence?): String = cs?.toString()?.trim() ?: ""
-
-    private data class NotiData(
-        val title: String,
-        val text: String,
-        val bigText: String,
-        val conversationTitle: String
-    )
-}
