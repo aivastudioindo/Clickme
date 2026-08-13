@@ -44,15 +44,18 @@ class SettingsFragment : Fragment() {
             updateStatus(isChecked)
         }
 
-        binding.editToken.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                prefs.edit().putString("telegram_token", binding.editToken.text.toString().trim()).apply()
-            }
-        }
-        binding.editChatId.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                prefs.edit().putString("telegram_chat_id", binding.editChatId.text.toString().trim()).apply()
-            }
+        binding.btnSaveTelegram.setOnClickListener {
+            val newToken = binding.editToken.text.toString().trim()
+            val newChatId = binding.editChatId.text.toString().trim()
+            prefs.edit()
+                .putString("telegram_token", newToken)
+                .putString("telegram_chat_id", newChatId)
+                .apply()
+            android.widget.Toast.makeText(
+                requireContext(),
+                R.string.telegram_saved_ok,
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
         }
     }
 

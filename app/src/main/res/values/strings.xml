@@ -30,4 +30,6 @@
     <string name="telegram_status_off">Penerusan nonaktif</string>
     <string name="telegram_status_on">Penerusan aktif</string>
     <string name="telegram_hint">Setiap notifikasi yang masuk akan dikirim ke chat Telegram tersebut.</string>
+    <string name="telegram_save">Simpan pengaturan Telegram</string>
+    <string name="telegram_saved_ok">Pengaturan Telegram tersimpan</string>
 </resources>
