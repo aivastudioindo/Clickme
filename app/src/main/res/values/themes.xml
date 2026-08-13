@@ -12,11 +12,30 @@
         <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
         <item name="colorOutline">@color/outline</item>
         <item name="colorError">@color/error</item>
+        <item name="colorControlNormal">@color/on_surface_variant</item>
+        <item name="colorControlActivated">@color/accent</item>
+        <item name="colorControlHighlight">@color/accent</item>
+        <item name="android:editTextStyle">@style/Widget.Clickme.EditText</item>
         <item name="toolbarStyle">@style/Widget.Clickme.Toolbar</item>
     </style>
 
     <style name="Widget.Clickme.Toolbar" parent="Widget.Material3.Toolbar">
         <item name="titleTextAppearance">@style/TextAppearance.Clickme.Title</item>
+    </style>
+
+    <style name="Widget.Clickme.EditText" parent="Widget.Material3.TextInputEditText.FilledBox">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:minHeight">56dp</item>
+    </style>
+
+    <style name="Widget.Clickme.TextInputLayout" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxBackgroundMode">filled</item>
+        <item name="boxBackgroundColor">@color/surface_variant</item>
+        <item name="boxStrokeColor">@color/outline</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="hintTextColor">@color/on_surface_variant</item>
+        <item name="android:textColorHint">@color/on_surface_variant</item>
     </style>
 
     <style name="TextAppearance.Clickme.Title" parent="TextAppearance.Material3.TitleLarge">

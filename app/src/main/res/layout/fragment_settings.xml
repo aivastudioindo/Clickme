@@ -115,6 +115,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="@string/app_lock_password"
+        style="@style/Widget.Clickme.TextInputLayout"
         app:passwordToggleEnabled="true"
         app:hintTextColor="?attr/colorOnSurface">
 
@@ -125,7 +126,7 @@
             android:inputType="textPassword"
             android:textSize="18sp"
             android:textColor="?attr/colorOnSurface"
-            android:minHeight="52dp" />
+            android:minHeight="56dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
