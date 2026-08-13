@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.clickme.app.databinding.FragmentNotificationsBinding
 import com.clickme.app.repo.NotificationRepository
+import com.clickme.app.repo.NotificationStore
 import com.clickme.app.NotificationAdapter
 import com.clickme.app.NotificationService
 
@@ -54,8 +55,13 @@ class NotificationsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         // App kembali ke foreground: tarik notifikasi aktif agar tidak kosong
-        // setelah app ditutup dibuka kembali.
+        // setelah app ditutup dibuka kembali. Jika repository masih kosong
+        // (process di-kill), muat dari disk.
         NotificationService.requestActiveNotifications(requireContext())
+        if (NotificationRepository.getAll().isEmpty()) {
+            val saved = NotificationStore.load(requireContext())
+            if (saved.isNotEmpty()) NotificationRepository.seed(saved)
+        }
     }
 
     override fun onDestroyView() {

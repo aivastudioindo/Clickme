@@ -14,6 +14,8 @@ import com.clickme.app.databinding.ActivityMainBinding
 import com.clickme.app.ui.NotificationsFragment
 import com.clickme.app.ui.SettingsFragment
 import com.clickme.app.ui.AboutFragment
+import com.clickme.app.repo.NotificationRepository
+import com.clickme.app.repo.NotificationStore
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -29,6 +31,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(binding.root)
 
         setSupportActionBar(binding.topbar)
+
+        // Muat riwayat tersimpan dari disk agar tidak hilang saat app ditutup dibuka.
+        if (NotificationRepository.getAll().isEmpty()) {
+            val saved = NotificationStore.load(this)
+            if (saved.isNotEmpty()) NotificationRepository.seed(saved)
+        }
 
         drawer = binding.drawer
         val toggle = ActionBarDrawerToggle(

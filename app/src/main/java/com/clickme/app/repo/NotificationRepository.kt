@@ -20,6 +20,16 @@ object NotificationRepository {
         listeners.forEach { it(getAll()) }
     }
 
+    /** Isi repository dari penyimpanan disk (tanpa memicu notifikasi ganda). */
+    fun seed(itemsToAdd: List<NotificationItem>) {
+        items.addAll(0, itemsToAdd)
+        listeners.forEach { it(getAll()) }
+    }
+
+    fun saveToDisk(context: android.content.Context) {
+        NotificationStore.save(context, getAll())
+    }
+
     fun getAll(): List<NotificationItem> = items.toList()
 
     fun observe(callback: (List<NotificationItem>) -> Unit) {

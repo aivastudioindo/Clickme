@@ -179,5 +179,6 @@ class NotificationService : NotificationListenerService() {
 
         val item = buildItem(sbn, packageManager) ?: return
         NotificationRepository.add(item)
+        NotificationRepository.saveToDisk(applicationContext)
     }
 }
