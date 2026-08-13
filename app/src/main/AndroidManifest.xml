@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".ClickmeApp"
         android:allowBackup="true"
         android:extractNativeLibs="false"
         android:icon="@drawable/ic_launcher"

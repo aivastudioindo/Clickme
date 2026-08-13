@@ -20,14 +20,13 @@ object NotificationRepository {
         listeners.forEach { it(getAll()) }
     }
 
-    /** Isi repository dari penyimpanan disk (tanpa memicu notifikasi ganda). */
+    /** Isi repository dari penyimpanan disk (tanpa memicu notifikasi ganda).
+     *  Urutan dijaga: item pertama di list = terbaru (ada di posisi atas). */
     fun seed(itemsToAdd: List<NotificationItem>) {
-        for (it in itemsToAdd) {
-            if (it.id !in seenIds) {
-                seenIds.add(it.id)
-                items.add(0, it)
-            }
-        }
+        val filtered = itemsToAdd.filter { it.id !in seenIds }
+        if (filtered.isEmpty()) return
+        seenIds.addAll(filtered.map { it.id })
+        items.addAll(0, filtered)
         listeners.forEach { it(getAll()) }
     }
 

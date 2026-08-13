@@ -32,12 +32,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         setSupportActionBar(binding.topbar)
 
-        // Muat riwayat tersimpan dari disk agar tidak hilang saat app ditutup dibuka.
-        if (NotificationRepository.getAll().isEmpty()) {
-            val saved = NotificationStore.load(this)
-            if (saved.isNotEmpty()) NotificationRepository.seed(saved)
-        }
-
         drawer = binding.drawer
         val toggle = ActionBarDrawerToggle(
             this, drawer, binding.topbar,
