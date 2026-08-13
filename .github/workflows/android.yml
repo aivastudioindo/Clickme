@@ -46,7 +46,7 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: >-
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon --stacktrace
           -PSIGNING_STORE_FILE=app/release-key.jks
           -PSIGNING_STORE_PASSWORD="$SIGNING_STORE_PASSWORD"
           -PSIGNING_KEY_ALIAS="$SIGNING_KEY_ALIAS"
