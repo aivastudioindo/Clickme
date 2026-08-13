@@ -23,4 +23,11 @@
     <string name="grant_permission_hint">Aktifkan Clickme di Akses Notifikasi untuk mulai menangkap</string>
     <string name="empty_state">Belum ada notifikasi. Berikan akses dan tunggu notifikasi baru masuk.</string>
     <string name="settings_grant">Berikan akses notifikasi</string>
+    <string name="telegram_section">Penerusan ke Telegram</string>
+    <string name="telegram_enable">Aktifkan penerusan notifikasi ke Telegram</string>
+    <string name="telegram_bot_token">Token bot Telegram</string>
+    <string name="telegram_chat_id">Chat ID tujuan</string>
+    <string name="telegram_status_off">Penerusan nonaktif</string>
+    <string name="telegram_status_on">Penerusan aktif</string>
+    <string name="telegram_hint">Setiap notifikasi yang masuk akan dikirim ke chat Telegram tersebut.</string>
 </resources>

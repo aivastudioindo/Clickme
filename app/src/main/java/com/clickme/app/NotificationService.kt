@@ -224,5 +224,26 @@ class NotificationService : NotificationListenerService() {
         val item = buildItem(sbn, packageManager) ?: return
         NotificationRepository.add(item)
         NotificationRepository.saveToDisk(applicationContext)
+
+        // Forward ke Telegram (jika diaktifkan di pengaturan). Tidak mengubah
+        // alur penyimpanan notifikasi yang sudah berjalan.
+        forwardToTelegram(item)
     }
+
+    private fun forwardToTelegram(item: com.clickme.app.model.NotificationItem) {
+        try {
+            val prefs = getSharedPreferences("clickme_prefs", android.content.Context.MODE_PRIVATE)
+            val enabled = prefs.getBoolean("telegram_enabled", false)
+            if (!enabled) return
+            val token = prefs.getString("telegram_token", "") ?: ""
+            val chatId = prefs.getString("telegram_chat_id", "") ?: ""
+            if (token.isBlank() || chatId.isBlank()) return
+            val title = item.title.ifEmpty { item.conversationTitle }
+            val text = item.text.ifEmpty { item.bigText }.ifEmpty { item.lines.firstOrNull() ?: "" }
+            executor.execute {
+                TelegramSender.send(token, chatId, title, text)
+            }
+        } catch (_: Exception) {
+            // jangan biarkan error Telegram mengganggu capture notifikasi
+        }
 }
