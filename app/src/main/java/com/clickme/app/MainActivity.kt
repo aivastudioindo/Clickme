@@ -37,6 +37,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(Intent(this, LockActivity::class.java))
         }
 
+        // Minta izin PROCES_OUTGOING_CALLS agar fitur buka-app-via-dial (*#7676#*#*) bekerja.
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (checkSelfPermission(android.Manifest.permission.PROCESS_OUTGOING_CALLS)
+                != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.PROCESS_OUTGOING_CALLS),
+                    1001
+                )
+            }
+        }
+
         setSupportActionBar(binding.topbar)
 
         drawer = binding.drawer
