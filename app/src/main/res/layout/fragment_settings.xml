@@ -113,6 +113,7 @@
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="88dp"
         android:layout_marginTop="12dp"
         android:hint="@string/app_lock_password"
         style="@style/Widget.Clickme.TextInputLayout"
@@ -122,11 +123,14 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editLockPassword"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
             android:inputType="textPassword"
-            android:textSize="18sp"
+            android:textSize="22sp"
             android:textColor="?attr/colorOnSurface"
-            android:minHeight="56dp" />
+            android:minHeight="80dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

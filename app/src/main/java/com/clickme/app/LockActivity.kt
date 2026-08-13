@@ -13,6 +13,11 @@ class LockActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Sembunyikan konten dari recent apps / screenshot saat layar kunci tampil.
+        window.setFlags(
+            android.view.WindowManager.LayoutParams.FLAG_SECURE,
+            android.view.WindowManager.LayoutParams.FLAG_SECURE
+        )
         setContentView(R.layout.activity_lock)
 
         val prefs = getSharedPreferences("clickme_prefs", Context.MODE_PRIVATE)
