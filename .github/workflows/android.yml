@@ -46,11 +46,24 @@ jobs:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: >-
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew assembleRelease --no-daemon
           -PSIGNING_STORE_FILE=app/release-key.jks
           -PSIGNING_STORE_PASSWORD="$SIGNING_STORE_PASSWORD"
           -PSIGNING_KEY_ALIAS="$SIGNING_KEY_ALIAS"
           -PSIGNING_KEY_PASSWORD="$SIGNING_KEY_PASSWORD"
+
+      - name: Sign APK with apksigner
+        env:
+          KS_PASS: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          APK=app/build/outputs/apk/release/app-release-unsigned.apk
+          if [ ! -f "$APK" ]; then echo "unsigned apk not found"; ls app/build/outputs/apk/release/; exit 1; fi
+          API=$(ls $ANDROID_HOME/build-tools/*/apksigner | head -1)
+          echo "apksigner: $API"
+          "$API" sign --ks app/release-key.jks --ks-pass "pass:$KS_PASS" --ks-key-alias "$KEY_ALIAS" --key-pass "pass:$KEY_PASS" --out app/build/outputs/apk/release/app-release.apk "$APK"
+          echo "signed apk produced"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
