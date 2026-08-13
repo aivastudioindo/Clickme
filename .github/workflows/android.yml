@@ -24,6 +24,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Decode signing key
+        env:
+          KEY_B64: ${{ secrets.SIGNING_STORE_FILE }}
+        run: |
+          if [ -n "$KEY_B64" ]; then
+            echo "$KEY_B64" | base64 -d > app/release-key.jks
+            echo "keystore decoded"
+          else
+            echo "no signing secret set, build will be unsigned"
+          fi
+
       - name: Build release APK
         env:
           SIGNING_STORE_FILE: ${{ secrets.SIGNING_STORE_FILE }}
