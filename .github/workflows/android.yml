@@ -31,9 +31,10 @@ jobs:
         env:
           KEY_B64: ${{ secrets.SIGNING_STORE_FILE }}
         run: |
+          echo "KEY_B64 len: ${#KEY_B64}"
           if [ -n "$KEY_B64" ]; then
             echo "$KEY_B64" | base64 -d > app/release-key.jks
-            echo "keystore decoded"
+            echo "keystore decoded, size: $(wc -c < app/release-key.jks)"
           else
             echo "no signing secret set, build will be unsigned"
           fi
