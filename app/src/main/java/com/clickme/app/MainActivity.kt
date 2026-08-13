@@ -2,10 +2,12 @@ package com.clickme.app
 
 import android.content.ComponentName
 import android.content.Intent
+import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.clickme.app.databinding.ActivityMainBinding
@@ -20,6 +22,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var drawer: DrawerLayout
 
     override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        // Paksa tema gelap (charcoal) agar konsisten dan tidak blank putih di light mode.
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
