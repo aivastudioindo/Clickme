@@ -51,6 +51,13 @@ class NotificationsFragment : Fragment() {
         NotificationRepository.observe(observer)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // App kembali ke foreground: tarik notifikasi aktif agar tidak kosong
+        // setelah app ditutup dibuka kembali.
+        NotificationService.requestActiveNotifications(requireContext())
+    }
+
     override fun onDestroyView() {
         NotificationRepository.removeObserver(observer)
         _binding = null

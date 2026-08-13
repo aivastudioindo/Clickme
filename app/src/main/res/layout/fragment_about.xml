@@ -87,5 +87,24 @@
             android:textSize="14sp"
             android:lineSpacingExtra="4dp"
             android:textColor="?attr/colorOnSurfaceVariant" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/about_disclaimer_title"
+            android:fontFamily="@font/space_grotesk"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/about_disclaimer_body"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="?attr/colorOnSurfaceVariant" />
     </LinearLayout>
 </ScrollView>

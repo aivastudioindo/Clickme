@@ -143,7 +143,9 @@ class NotificationService : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-        // Listener siap. Bisa ambil getActiveNotifications() kalau perlu catch-up.
+        // Listener siap. Tarik notifikasi yang masih aktif di sistem agar riwayat
+        // tidak kosong saat app dibuka kembali (capture hanya dipanggil untuk notif baru).
+        requestActiveNotifications(this)
     }
 
     override fun onListenerDisconnected() {

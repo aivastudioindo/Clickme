@@ -1,64 +1,65 @@
 # Clickme
 
-A lightweight, privacy-first Android app that reads and displays **all** notifications on your device locally. Built with Kotlin + Material 3, no backend, no network calls.
+Aplikasi Android ringan dan berprioritas privasi yang membaca serta menampilkan **seluruh** notifikasi di perangkat Anda secara lokal. Dibangun dengan Kotlin + Material 3, tanpa server, tanpa panggilan jaringan.
 
 ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Android-34a853)
 
-## Features
+## Fitur
 
-- Captures every notification via the system `NotificationListenerService`
-- Live updating list (new notifications appear instantly)
-- Reads full message content, not just the title (`bigText` and stacked `textLines` are extracted)
-- Deduplication (per-app, 30s window) so repeated posts don't spam the list
-- Groups stacked notifications using `groupKey`
-- Modern Material 3 UI with a hamburger navigation drawer
-- Slots for future features (Search/Filter, Export) already in the drawer
-- Tiny release APK (minified + shrunk, ABI-filtered)
+- Menangkap setiap notifikasi melalui `NotificationListenerService` sistem
+- Daftar diperbarui langsung (notifikasi baru muncul instan)
+- Membaca isi pesan lengkap, bukan sekadar judul (`bigText` dan `textLines` bertumpuk diekstrak)
+- Deduplikasi (per-aplikasi, jendela 30 detik) agar kiriman berulang tidak membanjiri daftar
+- Mengelompokkan notifikasi bertumpuk menggunakan `groupKey`
+- Antarmuka Material 3 modern dengan navigation drawer hamburger
+- Slot fitur masa depan (Cari/Filter, Ekspor) sudah ada di drawer
+- APK rilis kecil (minify + shrink, filter ABI)
 
-## How it works
+## Cara kerja
 
-1. The system posts a notification.
-2. `NotificationService` (`NotificationListenerService`) receives it on a background thread.
-3. Content is extracted with fallbacks (`title → titleBig → conversationTitle`, `text → bigText → textLines → infoText`).
-4. The item is stored in an in-memory repository and pushed to the UI via an observer.
-5. The list in the Notifications screen updates live.
+1. Sistem menayangkan notifikasi.
+2. `NotificationService` (`NotificationListenerService`) menerimanya di thread latar.
+3. Konten diekstrak dengan fallback (`title → titleBig → conversationTitle`, `text → bigText → textLines → infoText`).
+4. Item disimpan di repository dan dikirim ke antarmuka melalui observer.
+5. Daftar di layar Notifikasi diperbarui langsung.
+6. Saat aplikasi dibuka kembali, notifikasi yang masih aktif di sistem ditarik ulang (catch-up) agar riwayat tidak kosong.
 
-## Permissions
+## Izin
 
-| Permission | Why |
+| Izin | Keperluan |
 | --- | --- |
-| `BIND_NOTIFICATION_LISTENER_SERVICE` | Required to read notifications. Enabled by the user in **Settings → Notification access → Clickme**. |
-| `POST_NOTIFICATIONS` | Android 13+ runtime post permission (used if the app ever notifies you). |
-| `RECEIVE_BOOT_COMPLETED` | Re-enables the listener after a reboot so nothing is missed. |
+| `BIND_NOTIFICATION_LISTENER_SERVICE` | Wajib untuk membaca notifikasi. Diaktifkan pengguna di **Setelan → Akses notifikasi → Clickme**. |
+| `POST_NOTIFICATIONS` | Izin tayang notifikasi runtime Android 13+ (dipakai bila aplikasi pernah men notify Anda). |
+| `RECEIVE_BOOT_COMPLETED` | Mengaktifkan kembali listener setelah reboot agar tidak ada yang terlewat. |
 
-No notification content ever leaves the device.
+Tidak ada konten notifikasi yang keluar dari perangkat.
 
 ## Build
 
-### Prerequisites
+### Prasyarat
 
-- Android SDK (API 34 platform + build-tools)
+- Android SDK (platform API 34 + build-tools)
 - JDK 17
 
-### Local
+### Lokal
 
 ```bash
-./gradlew assembleDebug      # debug APK
-./gradlew assembleRelease   # release APK (needs signing config)
+./gradlew assembleDebug      # APK debug
+./gradlew assembleRelease   # APK release (perlu konfigurasi signing)
 ```
 
 ### Signing
 
-For a signed release, provide these environment variables (or GitHub Secrets):
+Untuk rilis yang ditandatangani, sediakan variabel lingkungan berikut (atau GitHub Secrets):
 
-| Variable | Description |
+| Variabel | Keterangan |
 | --- | --- |
-| `SIGNING_STORE_FILE` | Path to the keystore (or base64 of it in CI) |
-| `SIGNING_STORE_PASSWORD` | Keystore password |
-| `SIGNING_KEY_ALIAS` | Key alias |
-| `SIGNING_KEY_PASSWORD` | Key password |
+| `SIGNING_STORE_FILE` | Path ke keystore (atau base64-nya di CI) |
+| `SIGNING_STORE_PASSWORD` | Kata sandi keystore |
+| `SIGNING_KEY_ALIAS` | Alias key |
+| `SIGNING_KEY_PASSWORD` | Kata sandi key |
 
-Generate a keystore locally:
+Buat keystore secara lokal:
 
 ```bash
 keytool -genkeypair -v -keystore release-key.jks -keyalg RSA \
@@ -67,24 +68,24 @@ keytool -genkeypair -v -keystore release-key.jks -keyalg RSA \
 
 ### CI
 
-Pushing to `main` triggers `.github/workflows/android.yml`, which builds a signed release APK and uploads it as an artifact (`clickme-release-apk`).
+Push ke `main` memicu `.github/workflows/android.yml` yang membangun APK rilis yang ditandatangani dan mengunggahnya sebagai artifact (`clickme-release-apk`).
 
-## Project structure
+## Struktur proyek
 
 ```
 app/src/main/
   java/com/clickme/app/
-    MainActivity.kt          # drawer host + navigation
-    NotificationService.kt   # listener (dedup, extraction, rebind)
-    BootReceiver.kt          # re-enable listener after reboot
-    NotificationAdapter.kt    # list adapter
+    MainActivity.kt          # host drawer + navigasi
+    NotificationService.kt   # listener (dedup, ekstraksi, rebind, catch-up)
+    BootReceiver.kt          # aktifkan kembali listener setelah reboot
+    NotificationAdapter.kt    # adapter list
     model/NotificationItem.kt
     repo/NotificationRepository.kt
     ui/NotificationsFragment.kt
     ui/SettingsFragment.kt
-  res/                       # layouts, themes, menu, drawables, font
+  res/                       # layout, theme, menu, drawable, font
 ```
 
-## License
+## Lisensi
 
 MIT
