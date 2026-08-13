@@ -27,6 +27,10 @@ object NotificationRepository {
         callback(getAll())
     }
 
+    fun removeObserver(callback: (List<NotificationItem>) -> Unit) {
+        listeners.remove(callback)
+    }
+
     fun markAllRead() {
         items.forEach { it.isNew = false }
         listeners.forEach { it(getAll()) }

@@ -9,12 +9,18 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.clickme.app.databinding.FragmentNotificationsBinding
 import com.clickme.app.repo.NotificationRepository
 import com.clickme.app.NotificationAdapter
+import com.clickme.app.NotificationService
 
 class NotificationsFragment : Fragment() {
 
     private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
     private lateinit var adapter: NotificationAdapter
+    private val observer: (List<com.clickme.app.model.NotificationItem>) -> Unit = { items ->
+        val b = _binding ?: return@observer
+        b.emptyState.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE
+        adapter.submitList(items)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,20 +40,19 @@ class NotificationsFragment : Fragment() {
         binding.list.adapter = adapter
 
         binding.swipeRefresh.setOnRefreshListener {
-            // catch-up: minta ulang notifikasi aktif dari sistem
+            // Catch-up: ambil ulang notifikasi yang masih aktif di sistem,
+            // lalu refresh tampilan. Tidak menghapus data yang sudah ada.
+            NotificationService.requestActiveNotifications(requireContext())
             binding.swipeRefresh.isRefreshing = false
-            NotificationRepository.markAllRead()
+            NotificationRepository.observe(observer)
         }
 
-        NotificationRepository.observe { items ->
-            binding.emptyState.visibility =
-                if (items.isEmpty()) View.VISIBLE else View.GONE
-            adapter.submitList(items)
-        }
+        NotificationRepository.observe(observer)
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
+        NotificationRepository.removeObserver(observer)
         _binding = null
+        super.onDestroyView()
     }
 }

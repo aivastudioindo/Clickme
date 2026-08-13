@@ -11,6 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.clickme.app.databinding.ActivityMainBinding
 import com.clickme.app.ui.NotificationsFragment
 import com.clickme.app.ui.SettingsFragment
+import com.clickme.app.ui.AboutFragment
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_settings -> replaceFragment(SettingsFragment())
             R.id.nav_search -> Toast.makeText(this, R.string.soon_search, Toast.LENGTH_SHORT).show()
             R.id.nav_export -> Toast.makeText(this, R.string.soon_export, Toast.LENGTH_SHORT).show()
-            R.id.nav_about -> Toast.makeText(this, R.string.about_text, Toast.LENGTH_SHORT).show()
+            R.id.nav_about -> replaceFragment(AboutFragment())
         }
         drawer.closeDrawer(GravityCompat.START)
         return true

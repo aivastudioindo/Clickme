@@ -12,6 +12,12 @@
     <string name="soon_search">Search / Filter coming soon</string>
     <string name="soon_export">Export coming soon</string>
     <string name="about_text">Clickme reads your device notifications locally. No data leaves your phone.</string>
+    <string name="about_overview_title">Overview</string>
+    <string name="about_overview_body">Clickme is a lightweight, on-device notification reader for Android. It captures notifications through the system Notification Listener service and presents them in a single, searchable timeline. The application runs entirely on the device and is designed to stay responsive even under a high volume of incoming notifications.</string>
+    <string name="about_privacy_title">Privacy</string>
+    <string name="about_privacy_body">All notification data is processed and stored locally in memory. No content is transmitted over the network, uploaded to a server, or shared with third parties. Clickme requires notification access solely to display your notifications on this device, and you can revoke that access at any time from system settings.</string>
+    <string name="about_tech_title">Technology</string>
+    <string name="about_tech_body">Built with Kotlin and AndroidX, using Material 3 for the interface and a NotificationListenerService for capture. Releases are produced through an automated, reproducible GitHub Actions pipeline.</string>
     <string name="grant_permission_hint">Enable Clickme in Notification access to start capturing</string>
     <string name="empty_state">No notifications yet. Grant access and wait for new notifications.</string>
     <string name="settings_grant">Grant notification access</string>

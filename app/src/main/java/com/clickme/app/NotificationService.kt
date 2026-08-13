@@ -65,6 +65,20 @@ class NotificationService : NotificationListenerService() {
         }
     }
 
+    /**
+     * Catch-up: ambil notifikasi yang sedang aktif di sistem dan masukkan ke repository.
+     * Dipanggil saat user tarik-refresh, agar list tidak kosong meski app baru dibuka.
+     */
+    fun requestActiveNotifications(context: Context) {
+        try {
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            for (sbn in nm.activeNotifications) {
+                onNotificationPosted(sbn)
+            }
+        } catch (_: Exception) {
+        }
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification?) {
         super.onNotificationPosted(sbn)
         val safe = sbn ?: return
