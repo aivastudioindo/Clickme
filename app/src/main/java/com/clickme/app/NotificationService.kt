@@ -32,6 +32,8 @@ class NotificationService : NotificationListenerService() {
 
     private val executor = Executors.newSingleThreadExecutor()
     private val recentNotificationsCache = LruCache<String, LastNotiData>(30)
+    // Dedupe khusus pengiriman Telegram agar notif sama tidak dikirim berulang-ulang.
+    private val telegramSentCache = LruCache<String, Long>(100)
 
     private data class LastNotiData(val title: String, val text: String, val date: Long)
 
@@ -264,6 +266,16 @@ class NotificationService : NotificationListenerService() {
             if (token.isBlank() || chatId.isBlank()) return
             val title = item.title.ifEmpty { item.conversationTitle }
             val text = item.text.ifEmpty { item.bigText }.ifEmpty { item.lines.firstOrNull() ?: "" }
+
+            // Dedupe: jangan kirim notif dengan isi sama dalam 30 detik terakhir.
+            // Mencegah pesan berulang di Telegram saat app sumber mem-post ulang
+            // notifikasi (update) atau saat catch-up memindai ulang.
+            val key = "${item.packageName}|${title}|${text}"
+            val now = System.currentTimeMillis()
+            val lastSent = telegramSentCache[key] ?: 0L
+            if (now - lastSent < DUPLICATE_WINDOW_MS) return
+            telegramSentCache.put(key, now)
+
             executor.execute {
                 TelegramSender.send(token, chatId, title, text)
             }
