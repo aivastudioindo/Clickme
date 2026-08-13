@@ -166,14 +166,28 @@ class NotificationService : NotificationListenerService() {
     }
 
     private fun shouldIgnore(sbn: StatusBarNotification): Boolean {
+        // Mengikuti logika repo referensi Alfio010 (NotificationListenerServiceImpl.shouldIgnoreNotification
+        // + NotiUtils.isAutoBlacklistedNotification + shouldDropByDefaultBlacklist).
+        return isAutoBlacklisted(sbn) || shouldDropByDefaultBlacklist(sbn)
+    }
+
+    // Setara NotiUtils.isAutoBlacklistedNotification (tanpa gate getAutoBlacklistOn,
+    // karena Clickme tidak punya setting itu -> dianggap selalu aktif seperti referensi).
+    private fun isAutoBlacklisted(sbn: StatusBarNotification): Boolean {
         val pkg = sbn.packageName ?: return true
-        if (pkg in SYSTEM_BLACKLIST) return true
-        // Blacklist spesifik (notif sistem/sampah), mirip repo Alfio010.
+        if (pkg.startsWith("com.whatsapp") && (sbn.key?.contains("null") == true)) return true
         if (pkg == "com.sec.android.app.clock.package") return true
         if (pkg == BuildConfig.APPLICATION_ID) return true
         if (sbn.key == "-1|android|27|null|1000") return true
         if (sbn.key == "charging_state") return true
         if (sbn.key == "com.sec.android.app.samsungapps|121314|null|10091") return true
+        return false
+    }
+
+    // Setara NotiUtils.shouldDropByDefaultBlacklist: buang notif ongoing & kategori sistem.
+    private fun shouldDropByDefaultBlacklist(sbn: StatusBarNotification): Boolean {
+        if (sbn.isOngoing) return true
+        if (sbn.notification.category == Notification.CATEGORY_SYSTEM) return true
         return false
     }
 
@@ -213,17 +227,14 @@ class NotificationService : NotificationListenerService() {
     }
 
     private fun capture(sbn: StatusBarNotification) {
-        val pkg = sbn.packageName ?: return
-        if (pkg in SYSTEM_BLACKLIST) return
-
         val extras: Bundle = sbn.notification?.extras ?: return
         val data = extract(extras)
 
         // Sama seperti repo Alfio010: dedupe per package + window 30 detik.
-        if (data.title.isEmpty() && data.text.isEmpty() && data.lines.isEmpty()) return
+        if (data.title.isEmpty() && data.text.isEmpty()) return
 
         val current = LastNotiData(data.title, data.text, sbn.notification.`when`)
-        val last = recentNotificationsCache[pkg]
+        val last = recentNotificationsCache[sbn.packageName]
         if (last == current) return
         if (last != null &&
             last.title == current.title &&
@@ -232,7 +243,7 @@ class NotificationService : NotificationListenerService() {
         ) {
             return
         }
-        recentNotificationsCache.put(pkg, current)
+        recentNotificationsCache.put(sbn.packageName, current)
 
         val item = buildItem(sbn, packageManager) ?: return
         NotificationRepository.add(item)
