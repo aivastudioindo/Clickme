@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.collection.LruCache
+import com.clickme.app.BuildConfig
 import com.clickme.app.model.NotificationItem
 import com.clickme.app.repo.NotificationRepository
 import java.util.concurrent.Executors
