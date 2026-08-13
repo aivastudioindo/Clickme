@@ -30,6 +30,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Cek kunci aplikasi: jika sandi diset dan belum unlock di sesi ini, tampilkan layar kunci.
+        val prefs = getSharedPreferences("clickme_prefs", android.content.Context.MODE_PRIVATE)
+        val hasLock = prefs.getString("app_lock_hash", "")?.isNotEmpty() == true
+        val sessionUnlocked = getSharedPreferences("clickme_session", android.content.Context.MODE_PRIVATE)
+            .getBoolean("unlocked", false)
+        if (hasLock && !sessionUnlocked) {
+            startActivity(Intent(this, LockActivity::class.java))
+        }
+
         setSupportActionBar(binding.topbar)
 
         drawer = binding.drawer

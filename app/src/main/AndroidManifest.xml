@@ -25,6 +25,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".LockActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Clickme" />
+
         <service
             android:name=".NotificationService"
             android:exported="true"

@@ -57,6 +57,73 @@ class SettingsFragment : Fragment() {
                 android.widget.Toast.LENGTH_SHORT
             ).show()
         }
+
+        setupAppLock(prefs)
+    }
+
+    private fun setupAppLock(prefs: android.content.SharedPreferences) {
+        val hasLock = prefs.getString("app_lock_hash", "")?.isNotEmpty() == true
+        binding.switchLock.isChecked = hasLock
+        updateLockStatus(hasLock)
+
+        binding.switchLock.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // Aktifkan: minta sandi lewat field, simpan hash
+                val pwd = binding.editLockPassword.text.toString()
+                if (pwd.length < 4) {
+                    binding.switchLock.isChecked = false
+                    android.widget.Toast.makeText(requireContext(), R.string.app_lock_too_short, android.widget.Toast.LENGTH_SHORT).show()
+                    return@setOnCheckedChangeListener
+                }
+                prefs.edit().putString("app_lock_hash", hash(pwd)).apply()
+                updateLockStatus(true)
+                android.widget.Toast.makeText(requireContext(), R.string.app_lock_saved_ok, android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                // Nonaktifkan: hapus hash
+                prefs.edit().remove("app_lock_hash").apply()
+                updateLockStatus(false)
+                android.widget.Toast.makeText(requireContext(), R.string.app_lock_removed_ok, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.btnSetLock.setOnClickListener {
+            val pwd = binding.editLockPassword.text.toString()
+            if (pwd.isEmpty()) {
+                android.widget.Toast.makeText(requireContext(), R.string.app_lock_empty, android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (pwd.length < 4) {
+                android.widget.Toast.makeText(requireContext(), R.string.app_lock_too_short, android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            prefs.edit().putString("app_lock_hash", hash(pwd)).apply()
+            binding.switchLock.isChecked = true
+            updateLockStatus(true)
+            android.widget.Toast.makeText(requireContext(), R.string.app_lock_saved_ok, android.widget.Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnRemoveLock.setOnClickListener {
+            prefs.edit().remove("app_lock_hash").apply()
+            binding.switchLock.isChecked = false
+            binding.editLockPassword.text?.clear()
+            updateLockStatus(false)
+            android.widget.Toast.makeText(requireContext(), R.string.app_lock_removed_ok, android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun updateLockStatus(enabled: Boolean) {
+        binding.lockStatus.text =
+            if (enabled) getString(R.string.app_lock_status_on)
+            else getString(R.string.app_lock_status_off)
+    }
+
+    private fun hash(input: String): String {
+        return try {
+            val bytes = java.security.MessageDigest.getInstance("SHA-256").digest(input.toByteArray())
+            bytes.joinToString("") { "%02x".format(it) }
+        } catch (_: Exception) {
+            input
+        }
     }
 
     private fun updateStatus(enabled: Boolean) {

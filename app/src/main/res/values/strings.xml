@@ -32,4 +32,19 @@
     <string name="telegram_hint">Setiap notifikasi yang masuk akan dikirim ke chat Telegram tersebut.</string>
     <string name="telegram_save">Simpan pengaturan Telegram</string>
     <string name="telegram_saved_ok">Pengaturan Telegram tersimpan</string>
+    <string name="app_lock_section">Kunci Aplikasi</string>
+    <string name="app_lock_enable">Aktifkan kunci aplikasi</string>
+    <string name="app_lock_password">Sandi (minimal 4 karakter)</string>
+    <string name="app_lock_set">Setel / Ubah Sandi</string>
+    <string name="app_lock_remove">Hapus Sandi</string>
+    <string name="app_lock_status_off">Kunci nonaktif</string>
+    <string name="app_lock_status_on">Kunci aktif</string>
+    <string name="app_lock_saved_ok">Sandi kunci tersimpan</string>
+    <string name="app_lock_removed_ok">Sandi kunci dihapus</string>
+    <string name="app_lock_empty">Masukkan sandi terlebih dahulu</string>
+    <string name="app_lock_too_short">Sandi minimal 4 karakter</string>
+    <string name="lock_title">Aplikasi Terkunci</string>
+    <string name="lock_hint">Masukkan sandi untuk membuka Clickme</string>
+    <string name="lock_unlock">Buka</string>
+    <string name="lock_wrong">Sandi salah</string>
 </resources>
