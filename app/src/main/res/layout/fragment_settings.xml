@@ -112,8 +112,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="88dp"
+        android:layout_height="96dp"
         android:layout_marginTop="12dp"
         android:hint="@string/app_lock_password"
         style="@style/Widget.Clickme.TextInputLayout"
@@ -126,9 +125,8 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:inputType="textPassword"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textColor="?attr/colorOnSurface"
-            android:minHeight="80dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp" />
     </com.google.android.material.textfield.TextInputLayout>
@@ -146,6 +144,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/app_lock_remove" />
+
+    <Button
+        android:id="@+id/btnHideApp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/hide_app" />
+
+    <TextView
+        android:id="@+id/hideStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/hide_app_hint"
+        android:textSize="12sp"
+        android:textColor="?attr/colorOnSurfaceVariant" />
 
     <TextView
         android:id="@+id/lockStatus"

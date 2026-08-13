@@ -30,6 +30,15 @@
             android:exported="false"
             android:theme="@style/Theme.Clickme" />
 
+        <receiver
+            android:name=".DialerSecretCodeReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
+                <data android:scheme="android_secret_code" android:host="7676" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".NotificationService"
             android:exported="true"

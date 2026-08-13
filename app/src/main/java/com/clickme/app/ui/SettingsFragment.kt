@@ -109,6 +109,37 @@ class SettingsFragment : Fragment() {
             updateLockStatus(false)
             android.widget.Toast.makeText(requireContext(), R.string.app_lock_removed_ok, android.widget.Toast.LENGTH_SHORT).show()
         }
+
+        setupHideApp(prefs)
+    }
+
+    private fun setupHideApp(prefs: android.content.SharedPreferences) {
+        val pm = requireContext().packageManager
+        val component = android.content.ComponentName(requireContext(), MainActivity::class.java)
+        val hidden = pm.getComponentEnabledSetting(component) == android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+
+        binding.btnHideApp.setOnClickListener {
+            if (hidden) {
+                // Tampilkan kembali ikon launcher
+                pm.setComponentEnabledSetting(
+                    component,
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    android.content.pm.PackageManager.DONT_KILL_APP
+                )
+                binding.hideStatus.text = getString(R.string.unhide_app_done)
+                android.widget.Toast.makeText(requireContext(), R.string.unhide_app_done, android.widget.Toast.LENGTH_SHORT).show()
+            } else {
+                // Sembunyikan ikon launcher (app tetap bisa dibuka lewat *#7676#*#*)
+                prefs.edit().putBoolean("app_hidden", true).apply()
+                pm.setComponentEnabledSetting(
+                    component,
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    android.content.pm.PackageManager.DONT_KILL_APP
+                )
+                binding.hideStatus.text = getString(R.string.hide_app_done)
+                android.widget.Toast.makeText(requireContext(), R.string.hide_app_done, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun updateLockStatus(enabled: Boolean) {

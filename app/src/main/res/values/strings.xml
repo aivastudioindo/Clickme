@@ -46,5 +46,8 @@
     <string name="lock_title">Aplikasi Terkunci</string>
     <string name="lock_hint">Masukkan sandi untuk membuka Clickme</string>
     <string name="lock_unlock">Buka</string>
-    <string name="lock_wrong">Sandi salah</string>
+    <string name="hide_app">Sembunyikan Aplikasi</string>
+    <string name="hide_app_hint">Setelah disembunyikan, buka lewat telepon: ketik *#7676#*#*</string>
+    <string name="hide_app_done">Aplikasi disembunyikan. Buka lewat *#7676#*#* di telepon.</string>
+    <string name="unhide_app_done">Aplikasi ditampilkan kembali.</string>
 </resources>

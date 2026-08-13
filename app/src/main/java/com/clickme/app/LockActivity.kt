@@ -3,6 +3,7 @@ package com.clickme.app
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -41,6 +42,17 @@ class LockActivity : AppCompatActivity() {
                 input.text.clear()
             }
         }
+    }
+
+    override fun onBackPressed() {
+        // Jangan izinkan keluar dari layar kunci dengan tombol Back.
+        // Harus memasukkan sandi yang benar.
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        // Blokir tombol Back fisik maupun gesture.
+        if (keyCode == KeyEvent.KEYCODE_BACK) return true
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun hash(input: String): String {
