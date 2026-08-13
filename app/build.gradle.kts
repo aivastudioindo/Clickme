@@ -23,7 +23,7 @@ android {
             // Signing aktif hanya bila secret SIGNING_STORE_FILE ter-set.
             // File keystore sudah di-decode ke <root>/app/release-key.jks oleh workflow.
             if (!System.getenv("SIGNING_STORE_FILE").isNullOrBlank()) {
-                val keystoreFile = rootProject.file("app/release-key.jks")
+                val keystoreFile = file("release-key.jks")
                 if (keystoreFile.exists()) {
                     storeFile = keystoreFile
                     storePassword = System.getenv("SIGNING_STORE_PASSWORD")
