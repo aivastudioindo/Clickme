@@ -20,16 +20,14 @@ android {
 
     signingConfigs {
         create("release") {
-            // Signing aktif hanya bila secret SIGNING_STORE_FILE ter-set.
-            // File keystore sudah di-decode ke <root>/app/release-key.jks oleh workflow.
-            if (!System.getenv("SIGNING_STORE_FILE").isNullOrBlank()) {
-                val keystoreFile = file("release-key.jks")
-                if (keystoreFile.exists()) {
-                    storeFile = keystoreFile
-                    storePassword = System.getenv("SIGNING_STORE_PASSWORD")
-                    keyAlias = System.getenv("SIGNING_KEY_ALIAS")
-                    keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
-                }
+            // Signing aktif bila keystore hasil decode ada di app/release-key.jks.
+            // Decode + password diinjeksi oleh workflow CI via -P properties.
+            val keystoreFile = file("release-key.jks")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = providers.gradleProperty("SIGNING_STORE_PASSWORD").orNull
+                keyAlias = providers.gradleProperty("SIGNING_KEY_ALIAS").orNull
+                keyPassword = providers.gradleProperty("SIGNING_KEY_PASSWORD").orNull
             }
         }
     }

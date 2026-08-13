@@ -34,18 +34,9 @@ jobs:
           if [ -n "$KEY_B64" ]; then
             echo "$KEY_B64" | base64 -d > app/release-key.jks
             echo "keystore decoded"
-            ls -la app/release-key.jks
-            head -c 16 app/release-key.jks | xxd | head -1
           else
             echo "no signing secret set, build will be unsigned"
           fi
-
-      - name: Debug signing inputs
-        run: |
-          echo "SIGNING_STORE_FILE set: ${SIGNING_STORE_FILE:+yes}"
-          echo "SIGNING_STORE_PASSWORD set: ${SIGNING_STORE_PASSWORD:+yes}"
-          echo "SIGNING_KEY_ALIAS set: ${SIGNING_KEY_ALIAS:+yes}"
-          ls -la app/release-key.jks 2>&1 || echo "release-key.jks MISSING"
 
       - name: Build release APK
         env:
