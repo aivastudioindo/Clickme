@@ -111,17 +111,19 @@ class NotificationService : NotificationListenerService() {
         }
 
         private fun fromLines(extras: Bundle): List<String> {
-            val raw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val seqs: List<CharSequence>? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 try {
                     @Suppress("UNCHECKED_CAST")
                     extras.getCharSequenceArrayList(Notification.EXTRA_TEXT_LINES)
+                        as? ArrayList<CharSequence>
                 } catch (_: Exception) {
-                    extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
+                    null
                 }
             } else {
-                extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
-            }
-            return raw?.filterNotNull()
+                null
+            } ?: extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)?.toList()
+
+            return seqs?.filterNotNull()
                 ?.map { it.toString().trim() }
                 ?.filter { it.isNotEmpty() }
                 ?: emptyList()
