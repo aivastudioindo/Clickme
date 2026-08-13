@@ -33,19 +33,17 @@ class NotificationService : NotificationListenerService() {
     private val executor = Executors.newSingleThreadExecutor()
     private val recentNotificationsCache = LruCache<String, LastNotiData>(30)
 
-    // Daftar paket/sistem yang boleh diabaikan (mirip repo Alfio010).
-    private val SYSTEM_BLACKLIST = setOf(
-        "android",
-        "com.android.systemui",
-        "com.android.providers.downloads",
-        "com.android.providers.media",
-        "com.android.packageinstaller"
-    )
-
     private data class LastNotiData(val title: String, val text: String, val date: Long)
 
     companion object {
         private const val DUPLICATE_WINDOW_MS = 30_000L
+        private val SYSTEM_BLACKLIST = setOf(
+            "android",
+            "com.android.systemui",
+            "com.android.providers.downloads",
+            "com.android.providers.media",
+            "com.android.packageinstaller"
+        )
 
         /**
          * Catch-up: ambil notifikasi yang sedang aktif di sistem dan masukkan ke repository.
