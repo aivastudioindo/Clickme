@@ -43,35 +43,11 @@ class NotificationService : NotificationListenerService() {
             "com.android.providers.media",
             "com.android.packageinstaller"
         )
-    }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
-        try {
-            requestRebind(ComponentName(this, this::class.java))
-        } catch (_: Exception) {
-        }
-        return START_STICKY
-    }
-
-    override fun onListenerConnected() {
-        super.onListenerConnected()
-        // Listener siap. Bisa ambil getActiveNotifications() kalau perlu catch-up.
-    }
-
-    override fun onListenerDisconnected() {
-        super.onListenerDisconnected()
-        try {
-            requestRebind(ComponentName(this, this::class.java))
-        } catch (_: Exception) {
-        }
-    }
-
-    /**
-     * Catch-up: ambil notifikasi yang sedang aktif di sistem dan masukkan ke repository.
-     * Dipanggil saat user tarik-refresh, agar list tidak kosong meski app baru dibuka.
-     */
-    companion object {
+        /**
+         * Catch-up: ambil notifikasi yang sedang aktif di sistem dan masukkan ke repository.
+         * Dipanggil saat user tarik-refresh, agar list tidak kosong meski app baru dibuka.
+         */
         fun requestActiveNotifications(context: Context) {
             try {
                 val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -154,6 +130,28 @@ class NotificationService : NotificationListenerService() {
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
         super.onNotificationRemoved(sbn)
         // notifikasi dihapus tidak kita hapus dari list agar riwayat tetap ada
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        try {
+            requestRebind(ComponentName(this, this::class.java))
+        } catch (_: Exception) {
+        }
+        return START_STICKY
+    }
+
+    override fun onListenerConnected() {
+        super.onListenerConnected()
+        // Listener siap. Bisa ambil getActiveNotifications() kalau perlu catch-up.
+    }
+
+    override fun onListenerDisconnected() {
+        super.onListenerDisconnected()
+        try {
+            requestRebind(ComponentName(this, this::class.java))
+        } catch (_: Exception) {
+        }
     }
 
     private fun capture(sbn: StatusBarNotification) {
