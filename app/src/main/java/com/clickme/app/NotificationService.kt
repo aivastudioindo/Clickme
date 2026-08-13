@@ -246,4 +246,5 @@ class NotificationService : NotificationListenerService() {
         } catch (_: Exception) {
             // jangan biarkan error Telegram mengganggu capture notifikasi
         }
+    }
 }
