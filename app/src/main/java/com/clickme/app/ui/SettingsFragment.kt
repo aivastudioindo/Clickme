@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.clickme.app.databinding.FragmentSettingsBinding
 import com.clickme.app.R
+import com.clickme.app.MainActivity
 
 class SettingsFragment : Fragment() {
 
