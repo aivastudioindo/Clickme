@@ -30,9 +30,6 @@ class LockActivity : AppCompatActivity() {
             }
             val enteredHash = hash(pwd)
             if (enteredHash == storedHash) {
-                // Buka: set flag session agar tidak diminta lagi di sesi ini
-                getSharedPreferences("clickme_session", Context.MODE_PRIVATE)
-                    .edit().putBoolean("unlocked", true).apply()
                 finish()
             } else {
                 wrong.visibility = android.view.View.VISIBLE

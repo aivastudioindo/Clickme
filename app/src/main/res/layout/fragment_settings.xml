@@ -115,13 +115,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="@string/app_lock_password"
-        app:passwordToggleEnabled="true">
+        app:passwordToggleEnabled="true"
+        app:hintTextColor="?attr/colorOnSurface">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editLockPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textSize="18sp"
+            android:textColor="?attr/colorOnSurface"
+            android:minHeight="52dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
