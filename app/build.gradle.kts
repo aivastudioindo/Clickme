@@ -20,16 +20,14 @@ android {
 
     signingConfigs {
         create("release") {
-            // Semua diinjeksi oleh workflow CI via -P properties.
-            val storeFilePath = providers.gradleProperty("SIGNING_STORE_FILE").orNull
-            if (!storeFilePath.isNullOrBlank()) {
-                val keystoreFile = file(storeFilePath)
-                if (keystoreFile.exists()) {
-                    storeFile = keystoreFile
-                    storePassword = providers.gradleProperty("SIGNING_STORE_PASSWORD").orNull
-                    keyAlias = providers.gradleProperty("SIGNING_KEY_ALIAS").orNull
-                    keyPassword = providers.gradleProperty("SIGNING_KEY_PASSWORD").orNull
-                }
+            // Keystore di-decode oleh workflow ke app/release-key.jks (selalu ada di CI).
+            // Password diinjeksi via -P gradle properties.
+            val keystoreFile = file("release-key.jks")
+            if (keystoreFile.exists()) {
+                storeFile = keystoreFile
+                storePassword = providers.gradleProperty("SIGNING_STORE_PASSWORD").orNull
+                keyAlias = providers.gradleProperty("SIGNING_KEY_ALIAS").orNull
+                keyPassword = providers.gradleProperty("SIGNING_KEY_PASSWORD").orNull
             }
         }
     }
