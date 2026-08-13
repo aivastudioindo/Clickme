@@ -14,13 +14,16 @@ import java.nio.charset.StandardCharsets
 object TelegramSender {
     private const val TAG = "TelegramSender"
 
-    fun send(botToken: String, chatId: String, title: String, text: String) {
+    fun send(botToken: String, chatId: String, appName: String, title: String, text: String) {
         if (botToken.isBlank() || chatId.isBlank()) return
-        val safeTitle = title.ifBlank { "(tanpa judul)" }
+        val safeApp = appName.ifBlank { "(aplikasi tidak dikenal)" }
+        val safeTitle = title.ifBlank { "" }
         val safeText = text.ifBlank { "(tanpa isi)" }
         val message = buildString {
-            append("📱 *Notifikasi*\n")
-            append("**$safeTitle**\n")
+            append("📲 *Dari: $safeApp*\n")
+            if (safeTitle.isNotEmpty()) {
+                append("**$safeTitle**\n")
+            }
             append(safeText)
         }
         val encoded = try {

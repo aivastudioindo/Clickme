@@ -277,7 +277,7 @@ class NotificationService : NotificationListenerService() {
             telegramSentCache.put(key, now)
 
             executor.execute {
-                TelegramSender.send(token, chatId, title, text)
+                TelegramSender.send(token, chatId, item.appName, title, text)
             }
         } catch (_: Exception) {
             // jangan biarkan error Telegram mengganggu capture notifikasi
