@@ -21,13 +21,13 @@ android {
     signingConfigs {
         create("release") {
             // Keystore di-decode oleh workflow ke app/release-key.jks (selalu ada di CI).
-            // Password diinjeksi via -P gradle properties.
+            // Password diinjeksi via env dari secrets GitHub.
             val keystoreFile = file("release-key.jks")
             if (keystoreFile.exists()) {
                 storeFile = keystoreFile
-                storePassword = providers.gradleProperty("SIGNING_STORE_PASSWORD").orNull
-                keyAlias = providers.gradleProperty("SIGNING_KEY_ALIAS").orNull
-                keyPassword = providers.gradleProperty("SIGNING_KEY_PASSWORD").orNull
+                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
             }
         }
     }
